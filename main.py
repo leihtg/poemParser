@@ -2,7 +2,7 @@
 import re
 from urllib import request
 from html.parser import HTMLParser
-import cx_Oracle as oracle
+import redis
 
 class Parser(HTMLParser):
     def __init__(self):
@@ -40,18 +40,16 @@ if __name__ == "__main__":
     cout = 0
     p = Parser()
 
-    # for i in range(1, 100):
-    #     data = p.getHtml(i)
-    #     p.feed(data)
-    #     print('page:%s' % i)
-    #     for a in p.movies:
-    #         cout += 1
-    #         print(cout, a)
-    # dsn = oracle.makedsn("localhost", 1521, "ORCL")
-    # conn = oracle.connect("Lei", "lei", dsn)
-    # print(conn)
+    for i in range(1, 100):
+        data = p.getHtml(i)
+        p.feed(data)
+        print('page:%s' % i)
+        for a in p.movies:
+            cout += 1
+            print(cout, a)
+
     jpg=request.urlopen('https://img.gushiwen.org/authorImg/sushi.jpg')
-    f=open(r'C:\Users\Thinkpad\Desktop\sdp.jpg','wb')
+    f=open(r'C:\Users\leihuating\Desktop\sdp.jpg','wb')
     f.write(jpg.read())
     print(f.tell())
     print(jpg.read())
