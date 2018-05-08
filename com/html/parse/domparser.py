@@ -1,35 +1,20 @@
 # -*- coding: utf-8 -*-
 from html.parser import HTMLParser
+from com.html.parse.dom import *
 import urllib.request as req
-import re
 
 """
 解析DOM标签
 """
 
 
-class Dom:
-    def __init__(self, tagName="text", attrs=()):
-        self.children = []
-        self.attrs = attrs
-        self.tagName = tagName
-        self.text = ""
-
-    def setAttrs(self, attrs):
-        self.attrs = attrs
-
-    def addChild(self, dom):
-        self.children.append(dom)
-
-    def setText(self, text):
-        self.text += text
-
-
+# 解析主类
 class HtmlDomParser(HTMLParser):
     st = False
     rootDom = Dom()
     curDom = rootDom
     domQueue = []
+    data = ""
 
     def __init__(self, url=""):
         HTMLParser.__init__(self)
@@ -38,10 +23,13 @@ class HtmlDomParser(HTMLParser):
     def setUrl(self, url):
         self.url = url
 
+    def setData(self, data=""):
+        self.data = data
+
     def parse(self):
-        # data = req.urlopen(self.url).read().decode("utf-8")
-        data = open(r'C:\Users\Thinkpad\Desktop\a.txt', encoding="utf-8")
-        self.feed(data.read())
+        if self.data == "":
+            self.data = req.urlopen(self.url).read().decode("utf-8")
+        self.feed(self.data)
 
     # Overridable -- finish processing of start+end tag: <tag.../>
     def handle_startendtag(self, tag, attrs):
@@ -90,4 +78,4 @@ class HtmlDomParser(HTMLParser):
         pass
 
     def getDom(self):
-        return self.rootDom.children.pop()
+        return self.rootDom

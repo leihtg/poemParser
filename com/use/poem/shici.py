@@ -44,12 +44,12 @@ if __name__ == "__main__":
     cout = 0
     p = Parser()
     r = redis.Redis(host="localhost", port=6379, db=0)
-    # for i in range(1, 100):
-    #     data = p.getHtml(i)
-    #     p.feed(data)
-    #     print('page:%s' % i)
-    #     for a in p.movies:
-    #         r.lpush("sushi", a)
-    #         cout += 1
-    #         # print(cout, a)
-    #     print("over")
+    for i in range(1, 100):
+        data = p.getHtml(i)
+        p.feed(data)
+        print('page:%s' % i)
+        for a in p.movies:
+            r.lpush("sushi", a)
+            cout += 1
+            # print(cout, a)
+        print("over")
