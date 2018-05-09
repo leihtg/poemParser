@@ -1,6 +1,20 @@
+import re
+from enum import Enum, unique
+
 '''
 解析DOM树
 '''
+
+
+# selectorType = Enum("ID", "TAG", "CLASS", "ATTR")
+
+
+@unique
+class StorType(Enum):
+    ID = 0
+    TAG = 1
+    CLASS = 3
+    ATTR = 4
 
 
 class Dom:
@@ -15,6 +29,9 @@ class Dom:
 
     def setAttrs(self, attrs):
         self.attrs = attrs
+
+    def setChildren(self, cs):
+        self.children = cs
 
     def addChild(self, dom):
         self.children.append(dom)
@@ -33,21 +50,60 @@ class Dom:
                 return True
         return False
 
-    def __find(self, an, av, q=[]):
+    def __findAttr(self, an, av, q=[]):
         if self.hasAttr(an, av):
             q.append(self)
         else:
             for c in self.children:
-                c.__find(an, av, q)
+                c.__findAttr(an, av, q)
+        return q
+
+    def __findTag(self, tn, q=[]):
+        if self.tagName == tn:
+            q.append(self)
+        else:
+            for c in self.children:
+                c.__findTag(tn, q)
         return q
 
     def find(self, selector=""):
         q = []
-        if selector == "":
-            return q
-        if "#" == selector[:1]:
-            return self.__find('id', selector[1:], q)
-        elif "." == selector[:1]:
-            return self.__find('class', selector[1:], q)
+        ret = quickSpeci(selector)
+        if ret:
+            t, v = ret[0], ret[1]
+            if t == StorType.ID:
+                self.__findAttr('id', v, q)
+            elif t == StorType.TAG:
+                self.__findTag(v,q)
+            elif t == StorType.CLASS:
+                self.__findAttr('class', v, q)
 
-        return q
+        dom = Dom()
+        dom.setChildren(q)
+        return dom
+
+
+# id , tag or class
+rquickExpr = re.compile(r'^#([\w-]+)|(\w+)|\.([\w-]+)$')
+
+
+def quickSpeci(selector):
+    ret = rquickExpr.match(selector)
+    if ret.group(1):
+        return (StorType.ID, ret.group(1))
+    elif ret.group(2):
+        return (StorType.TAG, ret.group(2))
+    elif ret.group(3):
+        return (StorType.CLASS, ret.group(3))
+    return None
+
+
+if __name__ == "__main__":
+    a = rquickExpr.match("#id")
+    print(a.group(1), a)
+    a = rquickExpr.match("tag")
+    print(a.group(1), a)
+    a = rquickExpr.match(".class")
+    print(a.group(3), a)
+    print(type(a))
+    print(StorType.ATTR)
