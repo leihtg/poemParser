@@ -67,19 +67,17 @@ class Dom:
         return q
 
     def find(self, selector=""):
-        q = []
+        dom = Dom()
+        q = dom.children
         ret = quickSpeci(selector)
         if ret:
             t, v = ret[0], ret[1]
             if t == StorType.ID:
                 self.__findAttr('id', v, q)
             elif t == StorType.TAG:
-                self.__findTag(v,q)
+                self.__findTag(v, q)
             elif t == StorType.CLASS:
                 self.__findAttr('class', v, q)
-
-        dom = Dom()
-        dom.setChildren(q)
         return dom
 
 

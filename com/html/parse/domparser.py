@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from html.parser import HTMLParser
 from com.html.parse.dom import *
+from urllib import parse as ps
 import urllib.request as req
 
 """
@@ -11,17 +12,31 @@ import urllib.request as req
 # 解析主类
 class HtmlDomParser(HTMLParser):
     st = False
-    rootDom = Dom()
-    curDom = rootDom
-    domQueue = []
-    data = ""
 
     def __init__(self, url=""):
         HTMLParser.__init__(self)
         self.url = url
+        self.curDom = self.rootDom = Dom()
+        self.domQueue = []
+        self.data = ""
 
     def setUrl(self, url):
         self.url = url
+
+    def getRealUrl(self, urlSuffix=""):
+        if urlSuffix == "":
+            return self.url
+        elif "http" == urlSuffix[:4]:
+            return urlSuffix
+        hurl = ps.urlparse(self.url)
+        _url = "%s://%s" % (hurl.scheme, hurl.hostname)
+        if hurl.port:
+            _url += ":" + str(hurl.port)
+        if "/" == urlSuffix[:1]:
+            _url += urlSuffix
+        else:
+            _url += hurl.path[:hurl.path.rindex('/') + 1] + urlSuffix
+        return _url
 
     def setData(self, data=""):
         self.data = data
