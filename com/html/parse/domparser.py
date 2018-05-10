@@ -7,6 +7,7 @@ import urllib.request as req
 """
 解析DOM标签
 """
+debug = None
 
 
 # 解析主类
@@ -48,40 +49,51 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- finish processing of start+end tag: <tag.../>
     def handle_startendtag(self, tag, attrs):
-        # print("start_end: %s" % tag)
+        if debug:
+            print("start_end: %s" % tag)
         self.curDom.addChild(Dom(tag, attrs))
         pass
 
     # Overridable -- handle start tag
     def handle_starttag(self, tag, attrs):
-        # print("start: %s" % tag)
+        if debug:
+            print("start: %s" % tag)
         self.st = True
-        self.domQueue.append(self.curDom)
         dom = Dom(tag, attrs)
         self.curDom.addChild(dom)
         dom.parent = self.curDom
-        self.curDom = dom
+
         # 有时br标签并没有关闭
-        if "br" == tag:
+        if "br" == tag or "img" == tag:
             self.handle_endtag(tag)
+            pass
+        else:
+            self.domQueue.append(self.curDom)
+            self.curDom = dom
         pass
 
     # Overridable -- handle end tag
     def handle_endtag(self, tag):
-        # print("end: %s" % tag)
+        if debug:
+            print("end: %s" % tag)
         self.st = False
-        if len(self.domQueue):
-            self.curDom = self.domQueue.pop()
+        # 一些网页不规范,不该有关闭标签的忽略
+        if "br" == tag or "img" == tag:
+            self.curDom.addChild(Dom(tag))
+            return
+        self.curDom = self.domQueue.pop()
         pass
 
     # Overridable -- handle character reference
     def handle_charref(self, name):
-        # print("charref: %s" % name)
+        if debug:
+            print("charref: %s" % name)
         pass
 
     # Overridable -- handle entity reference
     def handle_entityref(self, name):
-        # print("entityref: %s" % name)
+        if debug:
+            print("entityref: %s" % name)
         pass
 
     # Overridable -- handle data
@@ -100,7 +112,8 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- handle processing instruction
     def handle_pi(self, data):
-        # print("pi: %s" % data)
+        if debug:
+            print("pi: %s" % data)
         pass
 
     def getDom(self):

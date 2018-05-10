@@ -11,6 +11,7 @@ r = redis.Redis(host="localhost", port=6379, db=0)
 # 查询指定作者的诗词
 def queryPoems(url, next=False, count=0):
     ps = HtmlParser(url)
+    # ps.setData(open(r"C:\Users\Thinkpad\Desktop\a.txt",encoding="utf-8").read())
     ps.parse()
     dom = ps.getDom()
     pages = dom.find('.pages')
@@ -60,6 +61,6 @@ if __name__ == "__main__":
     # 作者首页
     url = "https://so.gushiwen.org/authors/"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
-    queryAuthors(url)
-    # queryPoems('https://so.gushiwen.org/authors/authorvsw_85097dd0c645A38.aspx')
+    # queryAuthors(url)
+    queryPoems('https://so.gushiwen.org/authors/authorvsw_85097dd0c645A38.aspx')
     print('cost (s) %f' % (t.time() - start))
