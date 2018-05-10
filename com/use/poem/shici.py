@@ -9,7 +9,7 @@ r = redis.Redis(host="localhost", port=6379, db=0)
 
 
 # 查询指定作者的诗词
-def queryPoems(url, count=0):
+def queryPoems(url, next=False, count=0):
     ps = HtmlParser(url)
     ps.parse()
     dom = ps.getDom()
@@ -22,10 +22,10 @@ def queryPoems(url, count=0):
         count += 1
         print(count, t.text)
     np = pages.find('a').children
-    if np:
+    if next and np:
         na = np.pop()
         if "下一页" == na.text:
-            # queryPoems(ps.getRealUrl(na.attr('href')), count)
+            queryPoems(ps.getRealUrl(na.attr('href')), next, count)
             pass
 
     pass
@@ -44,7 +44,7 @@ def queryAuthors(url, count=0):
         print(count, k.text)
         # 获取作者诗文链接
         swLink = a.find('.cont').find('a').children.pop().attr('href')
-        queryPoems(ps.getRealUrl(swLink))
+        queryPoems(ps.getRealUrl(swLink), True)
         # r.lpush("authors",k.text)
     nextPage = pages.find('a').children.pop()
     curPage = pages.find('span').children[0]
@@ -60,6 +60,6 @@ if __name__ == "__main__":
     # 作者首页
     url = "https://so.gushiwen.org/authors/"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
-    # queryAuthors(url)
-    queryPoems('https://so.gushiwen.org/authors/authorvsw_b90660e3e492A41.aspx')
+    queryAuthors(url)
+    # queryPoems('https://so.gushiwen.org/authors/authorvsw_85097dd0c645A38.aspx')
     print('cost (s) %f' % (t.time() - start))

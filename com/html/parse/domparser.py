@@ -48,13 +48,13 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- finish processing of start+end tag: <tag.../>
     def handle_startendtag(self, tag, attrs):
-        # print("start_end:%s" % tag)
+        # print("start_end: %s" % tag)
         self.curDom.addChild(Dom(tag, attrs))
         pass
 
     # Overridable -- handle start tag
     def handle_starttag(self, tag, attrs):
-        # print("start:%s" % tag)
+        # print("start: %s" % tag)
         self.st = True
         self.domQueue.append(self.curDom)
         dom = Dom(tag, attrs)
@@ -68,19 +68,20 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- handle end tag
     def handle_endtag(self, tag):
-        # print("end:%s" % tag)
+        # print("end: %s" % tag)
         self.st = False
-        self.curDom = self.domQueue.pop()
+        if len(self.domQueue):
+            self.curDom = self.domQueue.pop()
         pass
 
     # Overridable -- handle character reference
     def handle_charref(self, name):
-        # print("charref:%s" % name)
+        # print("charref: %s" % name)
         pass
 
     # Overridable -- handle entity reference
     def handle_entityref(self, name):
-        # print("entityref:%s" % name)
+        # print("entityref: %s" % name)
         pass
 
     # Overridable -- handle data
@@ -99,7 +100,7 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- handle processing instruction
     def handle_pi(self, data):
-        # print("pi:%s" % data)
+        # print("pi: %s" % data)
         pass
 
     def getDom(self):
