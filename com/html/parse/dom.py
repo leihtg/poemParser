@@ -23,6 +23,7 @@ class Dom:
         self.attrs = attrs
         self.tagName = tagName
         self.text = ""
+        self.parent = None
 
     def __str__(self):
         return "tagName[%s],attrs:%s" % (self.tagName, self.attrs)
@@ -80,8 +81,12 @@ class Dom:
                 self.__findAttr('class', v, q)
         return dom
 
+    def html(self,ctx = ""):
+        return ctx
 
-# id , tag or class
+    # id , tag or class
+
+
 rquickExpr = re.compile(r'^#([\w-]+)|(\w+)|\.([\w-]+)$')
 
 
