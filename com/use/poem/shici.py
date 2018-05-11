@@ -74,14 +74,13 @@ def queryAuthors(url, count=0):
 # 提取诗词标题作者朝代等
 def trimPoem(id, aId, data=""):
     poem = {}
-    pos = data.rindex("——")
+    pos = data.index("——")
     s = data.index("《", pos)
     e = data.rindex("》")
     poem['id'] = "%d_%d" % (aId, id)
     poem['authorId'] = str(aId)
     poem['title'] = data[s + 1:e]
     poem['content'] = data[:pos]
-    print(poem)
     savePoem(poem)
 
 
@@ -104,7 +103,8 @@ if __name__ == "__main__":
 
     # 作者首页
     url = "https://so.gushiwen.org/authors/"
+    url = "https://so.gushiwen.org/authors/Default.aspx?p=10&c=%E4%B8%8D%E9%99%90"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
-    queryAuthors(url)
-    # queryPoems('https://so.gushiwen.org/authors/authorvsw_85097dd0c645A38.aspx')
+    queryAuthors(url,85)
+    # queryPoems('https://so.gushiwen.org/authors/authorvsw_6485481407d1A7.aspx',1)
     print('cost (s) %f' % (t.time() - start))
