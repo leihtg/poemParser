@@ -65,7 +65,6 @@ class HtmlDomParser(HTMLParser):
 
         # 有时br标签并没有关闭
         if "br" == tag or "img" == tag:
-            self.handle_endtag(tag)
             pass
         else:
             self.domQueue.append(self.curDom)
