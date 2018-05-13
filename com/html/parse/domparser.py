@@ -15,6 +15,7 @@ class HtmlDomParser(HTMLParser):
     st = False
 
     def __init__(self, url=""):
+        print(url)
         HTMLParser.__init__(self)
         self.url = url
         self.curDom = self.rootDom = Dom()

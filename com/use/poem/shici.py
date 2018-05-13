@@ -2,7 +2,7 @@
 # 解析诗词页面
 
 from com.html.parse import HtmlDomParser as HtmlParser
-from com.use.persist.mysql import Mysql
+# from com.use.persist.mysql import Mysql
 import re
 import redis
 import time as t
@@ -84,18 +84,20 @@ def trimPoem(id, aId, data=""):
     savePoem(poem)
 
 
-mysql = Mysql("172.29.97.155", "root", "root", "springboot", charset="utf8")
+# mysql = Mysql("172.29.97.155", "root", "root", "springboot", charset="utf8")
 
 
 def saveAuthor(data):
     sql = "insert Author(id,name) values ('%s','%s')" % (data['id'], data['name'])
-    mysql.exec(sql)
+    # mysql.exec(sql)
+    r.set(data['id'], data['name'])
 
 
 def savePoem(data):
     sql = "insert Poem (id,title,authorId,content) values('%s','%s','%s','%s')" % (
         data['id'], data['title'], data['authorId'], data['content'])
-    mysql.exec(sql)
+    r.lpush("a_%s" % data['authorId'], ("%s,%s" % (data['title'], data['content'])))
+    # mysql.exec(sql)
 
 
 if __name__ == "__main__":
@@ -105,6 +107,9 @@ if __name__ == "__main__":
     url = "https://so.gushiwen.org/authors/"
     url = "https://so.gushiwen.org/authors/Default.aspx?p=10&c=%E4%B8%8D%E9%99%90"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
-    queryAuthors(url,85)
+    # queryAuthors(url)
+    ur = "https://so.gushiwen.org/authors/authorvsw_ac457c107a00A12.aspx"
+    a = HtmlParser(url)
+    a.parse()
     # queryPoems('https://so.gushiwen.org/authors/authorvsw_6485481407d1A7.aspx',1)
     print('cost (s) %f' % (t.time() - start))
