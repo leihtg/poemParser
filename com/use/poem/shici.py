@@ -107,9 +107,6 @@ if __name__ == "__main__":
     url = "https://so.gushiwen.org/authors/"
     url = "https://so.gushiwen.org/authors/Default.aspx?p=10&c=%E4%B8%8D%E9%99%90"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
-    # queryAuthors(url)
-    ur = "https://so.gushiwen.org/authors/authorvsw_ac457c107a00A12.aspx"
-    a = HtmlParser(url)
-    a.parse()
+    queryAuthors(url)
     # queryPoems('https://so.gushiwen.org/authors/authorvsw_6485481407d1A7.aspx',1)
     print('cost (s) %f' % (t.time() - start))

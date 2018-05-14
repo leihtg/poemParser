@@ -12,7 +12,6 @@ debug = None
 
 # 解析主类
 class HtmlDomParser(HTMLParser):
-    st = False
 
     def __init__(self, url=""):
         print(url)
@@ -21,6 +20,7 @@ class HtmlDomParser(HTMLParser):
         self.curDom = self.rootDom = Dom()
         self.domQueue = []
         self.data = ""
+        self.st = False
 
     def setUrl(self, url):
         self.url = url
@@ -65,7 +65,7 @@ class HtmlDomParser(HTMLParser):
         dom.parent = self.curDom
 
         # 有时br标签并没有关闭
-        if "br" == tag or "img" == tag:
+        if oneTag(tag):
             pass
         else:
             self.domQueue.append(self.curDom)
@@ -78,10 +78,16 @@ class HtmlDomParser(HTMLParser):
             print("end: %s" % tag)
         self.st = False
         # 一些网页不规范,不该有关闭标签的忽略
-        if "br" == tag or "img" == tag:
+        if oneTag(tag):
             self.curDom.addChild(Dom(tag))
             return
-        self.curDom = self.domQueue.pop()
+        try:
+            self.curDom = self.domQueue.pop()
+        except BaseException as a:
+            print(self.data)
+            print("tag[%s],no next" % tag)
+        raise a
+
         pass
 
     # Overridable -- handle character reference
@@ -118,3 +124,17 @@ class HtmlDomParser(HTMLParser):
 
     def getDom(self):
         return self.rootDom
+
+
+onlyOneTag = ("br", "img", "link", "meta", "input")
+
+
+def oneTag(tag):
+    return tag in onlyOneTag
+
+
+if __name__ == "__main__":
+    debug = True
+    ps = HtmlDomParser()
+    ps.setData(open(r"C:\Users\leihuating\Desktop\a", encoding="utf-8").read())
+    ps.parse()

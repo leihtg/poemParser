@@ -28,6 +28,9 @@ class Dom:
     def __str__(self):
         return "tagName[%s],attrs:%s" % (self.tagName, self.attrs)
 
+    def __repr__(self):
+        return self.tagName
+
     def setAttrs(self, attrs):
         self.attrs = attrs
 
@@ -81,7 +84,7 @@ class Dom:
                 self.__findAttr('class', v, q)
         return dom
 
-    def html(self,ctx = ""):
+    def html(self, ctx=""):
         return ctx
 
     # id , tag or class
