@@ -70,6 +70,8 @@ class HtmlDomParser(HTMLParser):
         else:
             self.domQueue.append(self.curDom)
             self.curDom = dom
+            if debug:
+                print("%-8s" % repr(self.curDom), self.domQueue)
         pass
 
     # Overridable -- handle end tag
@@ -78,15 +80,18 @@ class HtmlDomParser(HTMLParser):
             print("end: %s" % tag)
         self.st = False
         # 一些网页不规范,不该有关闭标签的忽略
-        if oneTag(tag):
+        if oneTag(tag) and self.curDom.tagName != tag:
             self.curDom.addChild(Dom(tag))
             return
         try:
             self.curDom = self.domQueue.pop()
+            if debug:
+                print("%-8s" % repr(self.curDom), self.domQueue)
         except BaseException as a:
-            print(self.data)
+            if not debug:
+                print(self.data)
             print("tag[%s],no next" % tag)
-        raise a
+            raise a
 
         pass
 
@@ -126,7 +131,7 @@ class HtmlDomParser(HTMLParser):
         return self.rootDom
 
 
-onlyOneTag = ("br", "img", "link", "meta", "input")
+onlyOneTag = ("br", "img", "link", "meta", "input", "ul")
 
 
 def oneTag(tag):
@@ -135,6 +140,8 @@ def oneTag(tag):
 
 if __name__ == "__main__":
     debug = True
+    path = r"C:\Users\leihuating\Desktop\a"
+    path = r"C:\Users\Thinkpad\Desktop\a.txt"
     ps = HtmlDomParser()
-    ps.setData(open(r"C:\Users\leihuating\Desktop\a", encoding="utf-8").read())
+    ps.setData(open(path, encoding="utf-8").read())
     ps.parse()

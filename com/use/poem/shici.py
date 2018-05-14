@@ -20,14 +20,18 @@ def queryPoems(url, aId, next=False, count=0):
     pages = dom.find('.pagesright')
     cp = pages.find('#putpage').children[0]
     print("====第[%s]页===" % cp.attr('value'))
-    print("poem url: %s" % url)
     txea = dom.find('.main3').find('.left').find('textarea')
-    for t in txea.children:
-        if txtRe.match(t.attr('id')):
-            count += 1
-            print(count)
-            trimPoem(count, aId, t.text)
-
+    if not r.zscore("poems", url):  # 没有保存过
+        pipe = r.pipeline()
+        pipe.multi()
+        for t in txea.children:
+            if txtRe.match(t.attr('id')):
+                count += 1
+                print(count)
+                pipe.lpush(aId,t.text)
+                # trimPoem(count, aId, t.text)
+        pipe.execute()
+    r.zadd("poems", url, count)  # 添加到保存列表
     nurl = nextPage(pages)
     if nurl:
         queryPoems(ps.getRealUrl(nurl), aId, next, count)
@@ -61,7 +65,9 @@ def queryAuthors(url, count=0):
         saveAuthor(au)
         # 获取作者诗文链接
         swLink = a.find('.cont').find('a').children.pop().attr('href')
-        queryPoems(ps.getRealUrl(swLink), count, True)
+        if not r.zadd("authors", swLink, count):
+            continue
+        queryPoems(ps.getRealUrl(swLink), k.text, True)
         # r.lpush("authors",k.text)
     cp = pages.find('#putpage').children[0]
     print("=====第[%s]页完=====" % cp.attr('value'))
@@ -73,12 +79,12 @@ def queryAuthors(url, count=0):
 
 # 提取诗词标题作者朝代等
 def trimPoem(id, aId, data=""):
+    print(data)
     poem = {}
     pos = data.index("——")
     s = data.index("《", pos)
     e = data.rindex("》")
-    poem['id'] = "%d_%d" % (aId, id)
-    poem['authorId'] = str(aId)
+    poem['author'] = aId
     poem['title'] = data[s + 1:e]
     poem['content'] = data[:pos]
     savePoem(poem)
@@ -90,13 +96,13 @@ def trimPoem(id, aId, data=""):
 def saveAuthor(data):
     sql = "insert Author(id,name) values ('%s','%s')" % (data['id'], data['name'])
     # mysql.exec(sql)
-    r.set(data['id'], data['name'])
+    # r.set(data['id'], data['name'])
 
 
 def savePoem(data):
-    sql = "insert Poem (id,title,authorId,content) values('%s','%s','%s','%s')" % (
-        data['id'], data['title'], data['authorId'], data['content'])
-    r.lpush("a_%s" % data['authorId'], ("%s,%s" % (data['title'], data['content'])))
+    # sql = "insert Poem (id,title,authorId,content) values('%s','%s','%s','%s')" % (
+    #     data['id'], data['title'], data['authorId'], data['content'])
+    r.lpush("%s" % data['author'], ("%s" % (data)))
     # mysql.exec(sql)
 
 
