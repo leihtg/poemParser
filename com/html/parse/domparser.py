@@ -64,7 +64,7 @@ class HtmlDomParser(HTMLParser):
         self.curDom.addChild(dom)
         dom.parent = self.curDom
 
-        # 有时br标签并没有关闭
+        # 对于不存在内容的元素如br、img等
         if oneTag(tag):
             pass
         else:
@@ -81,6 +81,9 @@ class HtmlDomParser(HTMLParser):
         self.st = False
         # 一些网页不规范,不该有关闭标签的忽略
         if oneTag(tag) and self.curDom.tagName != tag:
+            self.curDom.addChild(Dom(tag))
+            return
+        elif self.curDom.tagName != tag:  # 没有对应的开始标签
             self.curDom.addChild(Dom(tag))
             return
         try:
@@ -131,7 +134,7 @@ class HtmlDomParser(HTMLParser):
         return self.rootDom
 
 
-onlyOneTag = ("br", "img", "link", "meta", "input", "ul")
+onlyOneTag = ("br","hr", "img", "link", "meta", "input")
 
 
 def oneTag(tag):
@@ -140,8 +143,8 @@ def oneTag(tag):
 
 if __name__ == "__main__":
     debug = True
-    path = r"C:\Users\leihuating\Desktop\a"
     path = r"C:\Users\Thinkpad\Desktop\a.txt"
+    path = r"C:\Users\leihuating\Desktop\a"
     ps = HtmlDomParser()
     ps.setData(open(path, encoding="utf-8").read())
     ps.parse()

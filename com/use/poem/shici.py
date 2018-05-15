@@ -28,7 +28,7 @@ def queryPoems(url, aId, next=False, count=0):
             if txtRe.match(t.attr('id')):
                 count += 1
                 print(count)
-                pipe.lpush(aId,t.text)
+                pipe.lpush(aId, t.text)
                 # trimPoem(count, aId, t.text)
         pipe.execute()
     r.zadd("poems", url, count)  # 添加到保存列表
@@ -65,9 +65,11 @@ def queryAuthors(url, count=0):
         saveAuthor(au)
         # 获取作者诗文链接
         swLink = a.find('.cont').find('a').children.pop().attr('href')
-        if not r.zadd("authors", swLink, count):
+        if r.zscore("authors", swLink):
+            print("%s,已保存:[%d]条" % (k.text, r.llen(k.text)))
             continue
         queryPoems(ps.getRealUrl(swLink), k.text, True)
+        r.zadd("authors", swLink, count)
         # r.lpush("authors",k.text)
     cp = pages.find('#putpage').children[0]
     print("=====第[%s]页完=====" % cp.attr('value'))
@@ -111,7 +113,6 @@ if __name__ == "__main__":
 
     # 作者首页
     url = "https://so.gushiwen.org/authors/"
-    url = "https://so.gushiwen.org/authors/Default.aspx?p=10&c=%E4%B8%8D%E9%99%90"
     # url = "https://so.gushiwen.org/authors/Default.aspx?p=102&c="
     queryAuthors(url)
     # queryPoems('https://so.gushiwen.org/authors/authorvsw_6485481407d1A7.aspx',1)
