@@ -27,7 +27,6 @@ def queryPoems(url, aId, next=False, count=0):
         for t in txea.children:
             if txtRe.match(t.attr('id')):
                 count += 1
-                print(count)
                 pipe.lpush(aId, t.text)
                 # trimPoem(count, aId, t.text)
         pipe.execute()

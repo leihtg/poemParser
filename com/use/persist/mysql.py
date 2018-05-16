@@ -25,15 +25,55 @@ class Mysql:
 
     def exec(self, sql):
         cursor = self.conn.cursor()
-        self.conn.begin()
-        rows = cursor.execute(sql)
-        self.conn.commit()
+        try:
+            # self.conn.begin()
+            rows = cursor.execute(sql)
+            # self.conn.commit()
+        except BaseException as args:
+            # self.conn.rollback()
+            raise Exception(args)
+
         return rows
 
+    def commit(self):
+        self.conn.commit()
 
 
 if __name__ == "__main__":
-    conn = Mysql("172.29.97.155", "root", "root", "springboot")
-    conn.exec("insert Poem values('asdk','z','kk',null,null)")
-    data = conn.query("select * from Author")
-    print(data)
+    import redis
+    import time as tt
+
+    conn = Mysql("172.29.97.155", "root", "root", "springboot", charset="utf8")
+
+
+    def saveAuthor(id, name):
+        conn.exec("insert into Author(id,name) values('%d','%s')" % (id, name))
+
+
+    def savePoem(id, title, authorId, content=""):
+        content = content.replace("'", "''")
+        conn.exec(
+            "insert into Poem(id,title,authorId,content) values ('%d','%s','%s','%s')" % (id, title, authorId, content))
+
+
+    start = tt.time()
+    r = redis.Redis(host="localhost", port=6379)
+    count = 0
+    t = 0
+    for a in r.keys():
+        if r.type(a) == b'list':
+            count += 1
+            saveAuthor(count, bytes(a).decode())
+            for i in range(r.llen(a)):
+                t += 1
+                data = bytes(r.lindex(a, i)).decode()
+
+                pos = data.index("——")
+                s = data.index("《", pos)
+                e = data.rindex("》")
+                title = data[s + 1:e]
+                content = data[:pos]
+                savePoem(t, title, count, content)
+            conn.commit()
+
+    print('cost (s) %f' % (tt.time() - start))
