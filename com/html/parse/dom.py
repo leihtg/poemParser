@@ -18,11 +18,11 @@ class StorType(Enum):
 
 
 class Dom:
-    def __init__(self, tagName="text", attrs=()):
+    def __init__(self, tagName="text", attrs=(), text=""):
         self.children = []
         self.attrs = attrs
         self.tagName = tagName
-        self.text = ""
+        self.text = text
         self.parent = None
 
     def __str__(self):
@@ -40,8 +40,23 @@ class Dom:
     def addChild(self, dom):
         self.children.append(dom)
 
-    def setText(self, text):
-        self.text += text
+    # 获取标签内容
+    def getText(self):
+        txt = self.text
+        for c in self.children:
+            if c.tagName == 'text':
+                txt += c.text
+            else:
+                txt += c.getText()
+        return txt
+
+    def toHtml(self):
+        txt=''
+        if(self.tagName=='text'):
+            return self.getText()
+        for c in self.children:
+            txt+=''
+        return txt
 
     def attr(self, name):
         for a in self.attrs:

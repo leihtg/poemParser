@@ -47,6 +47,7 @@ class HtmlDomParser(HTMLParser):
         if self.data == "":
             self.data = req.urlopen(self.url).read().decode("utf-8")
         self.feed(self.data)
+        return self.rootDom
 
     # Overridable -- finish processing of start+end tag: <tag.../>
     def handle_startendtag(self, tag, attrs):
@@ -113,7 +114,7 @@ class HtmlDomParser(HTMLParser):
     # Overridable -- handle data
     def handle_data(self, data):
         if self.st:
-            self.curDom.setText(data)
+            self.curDom.addChild(Dom(text=data))
         pass
 
     # Overridable -- handle comment
@@ -134,7 +135,7 @@ class HtmlDomParser(HTMLParser):
         return self.rootDom
 
 
-onlyOneTag = ("br","hr", "img", "link", "meta", "input")
+onlyOneTag = ("br", "hr", "img", "link", "meta", "input")
 
 
 def oneTag(tag):
