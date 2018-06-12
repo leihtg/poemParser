@@ -7,6 +7,6 @@ start = t.time()
 
 p = HtmlDomParser('https://blog.csdn.net/u013055678/article/details/78364774')
 dom = p.parse()
-print(dom.getText())
+print(dom.find('html').toHtml())
 
 print("find dom cost(s) %f" % (t.time() - start))

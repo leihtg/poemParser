@@ -143,9 +143,10 @@ def oneTag(tag):
 
 
 if __name__ == "__main__":
-    debug = True
-    path = r"C:\Users\Thinkpad\Desktop\a.txt"
+    debug = False
     path = r"C:\Users\leihuating\Desktop\a"
+    path = r"C:\Users\Thinkpad\Desktop\a.txt"
     ps = HtmlDomParser()
     ps.setData(open(path, encoding="utf-8").read())
-    ps.parse()
+    dom = ps.parse()
+    print(dom.find('html').toHtml())

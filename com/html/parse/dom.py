@@ -51,11 +51,15 @@ class Dom:
         return txt
 
     def toHtml(self):
-        txt=''
-        if(self.tagName=='text'):
+        if (self.tagName == 'text'):
             return self.getText()
+        txt = '<%s' % self.tagName
+        for attr in self.attrs:
+            txt += ' %s="%s"' % (attr[0], attr[1])
+        txt += '>'
         for c in self.children:
-            txt+=''
+            txt += c.toHtml()
+        txt += '</%s>' % self.tagName
         return txt
 
     def attr(self, name):
@@ -86,8 +90,7 @@ class Dom:
         return q
 
     def find(self, selector=""):
-        dom = Dom()
-        q = dom.children
+        q = []
         ret = quickSpeci(selector)
         if ret:
             t, v = ret[0], ret[1]
@@ -97,6 +100,11 @@ class Dom:
                 self.__findTag(v, q)
             elif t == StorType.CLASS:
                 self.__findAttr('class', v, q)
+        if len(q) > 0:
+            dom = q.pop(0)
+            # dom.children = q
+        else:
+            dom = Dom()
         return dom
 
     def html(self, ctx=""):
