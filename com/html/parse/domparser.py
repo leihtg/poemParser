@@ -14,7 +14,7 @@ debug = None
 class HtmlDomParser(HTMLParser):
 
     def __init__(self, url=""):
-        print(url)
+        print('parse:', url)
         HTMLParser.__init__(self)
         self.url = url
         self.curDom = self.rootDom = Dom()
@@ -114,7 +114,7 @@ class HtmlDomParser(HTMLParser):
     # Overridable -- handle data
     def handle_data(self, data):
         if self.st:
-            self.curDom.addChild(Dom(text=data))
+            self.curDom.addChild(Dom("text", text=data))
         pass
 
     # Overridable -- handle comment

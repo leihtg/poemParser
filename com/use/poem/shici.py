@@ -49,8 +49,7 @@ def nextPage(pages):
 # 查询所有作者
 def queryAuthors(url, count=0):
     ps = HtmlParser(url)
-    ps.parse()
-    dom = ps.getDom()
+    dom = ps.parse()
     pages = dom.find('.pagesright')
     authors = dom.find(".sonspic")
     for a in authors.children:
@@ -103,8 +102,9 @@ def saveAuthor(data):
 def savePoem(data):
     # sql = "insert Poem (id,title,authorId,content) values('%s','%s','%s','%s')" % (
     #     data['id'], data['title'], data['authorId'], data['content'])
-    r.lpush("%s" % data['author'], ("%s" % (data)))
+    # r.lpush("%s" % data['author'], ("%s" % (data)))
     # mysql.exec(sql)
+    print(data)
 
 
 if __name__ == "__main__":
