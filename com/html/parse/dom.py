@@ -46,3 +46,26 @@ class Dom:
             if name == a[0] and value == a[1]:
                 return True
         return False
+
+    def toHtml(self):
+        _dom = self
+        if (_dom.tagName == 'text'):
+            return _dom.getText()
+        txt = '<%s' % _dom.tagName
+        for attr in _dom.attrs:
+            txt += ' %s="%s"' % (attr[0], attr[1])
+        txt += '>'
+        for c in _dom.children:
+            txt += c.toHtml()
+        txt += '</%s>' % _dom.tagName
+        return txt
+
+    # 获取标签内容
+    def getText(self):
+        txt = self.text
+        for c in self.children:
+            if c.tagName == 'text':
+                txt += c.text
+            else:
+                txt += c.getText()
+        return txt

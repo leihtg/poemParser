@@ -12,50 +12,33 @@ class jQuery:
         self.dom = dom
         pass
 
-    # 获取标签内容
-    def getText(self):
-        txt = self.dom.text
-        for c in self.dom.children:
-            if c.tagName == 'text':
-                txt += c.text
-            else:
-                txt += c.getText()
-        return txt
-
-    def toHtml(self):
-        _dom = self.dom
-        if (_dom.tagName == 'text'):
-            return _dom.getText()
-        txt = '<%s' % _dom.tagName
-        for attr in _dom.attrs:
-            txt += ' %s="%s"' % (attr[0], attr[1])
-        txt += '>'
-        for c in _dom.children:
-            txt += c.toHtml()
-        txt += '</%s>' % _dom.tagName
-        return txt
-
     def attr(self, name):
-        _dom=self.dom
+        _dom = self.dom
         for a in _dom.attrs:
             if a[0] == name:
                 return a[1]
 
     def __findAttr(self, an, av, q=[]):
-        if self.hasAttr(an, av):
-            q.append(self)
-        else:
-            for c in self.children:
-                c.__findAttr(an, av, q)
+        for item in self.list:
+            if item.hasAttr(an, av):
+                q.append(item)
+            for c in item.children:
+                jQuery(c).__findAttr(an, av, q)
         return q
 
     def __findTag(self, tn, q=[]):
-        if self.tagName == tn:
-            q.append(self)
-        else:
-            for c in self.children:
-                c.__findTag(tn, q)
+        for item in self.list:
+            if item.tagName == tn:
+                q.append(self)
+            for c in item.children:
+                jQuery(c).__findTag(tn, q)
         return q
+
+    def toHtml(self):
+        return self.dom.toHtml()
+
+    def text(self):
+        return self.dom.getText()
 
     def find(self, selector=""):
         q = []

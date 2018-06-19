@@ -47,6 +47,8 @@ class HtmlDomParser(HTMLParser):
         if self.data == "":
             self.data = req.urlopen(self.url).read().decode("utf-8")
         self.feed(self.data)
+        if len(self.domQueue):
+            self.rootDom.addChild(self.domQueue.pop())
         return self.rootDom
 
     # Overridable -- finish processing of start+end tag: <tag.../>
@@ -63,7 +65,10 @@ class HtmlDomParser(HTMLParser):
         self.st = True
         dom = Dom(tag, attrs)
         self.curDom.addChild(dom)
-        dom.parent = self.curDom
+        if tag=="html":
+            self.rootDom=dom
+        else:
+            dom.parent = self.curDom
 
         # 对于不存在内容的元素如br、img等
         if oneTag(tag):
