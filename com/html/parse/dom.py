@@ -40,11 +40,15 @@ class Dom:
     def addChild(self, dom):
         self.children.append(dom)
 
-    def attr(self, name):
+    #如果传name和value则表示要修改属性
+    def attr(self, name, value=None):
         _dom = self
         for a in _dom.attrs:
             if name == a[0]:
-                return a[1]
+                if value:
+                    pass
+                else:
+                    return a[1]
         return False
 
     def toHtml(self):

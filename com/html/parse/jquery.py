@@ -13,17 +13,16 @@ class jQuery:
             self.list = [dom]
         pass
 
-
     def __repr__(self):
         return str(self.list)
 
-    def attr(self, name):
+    def attr(self, name, value=None):
         q = []
         for item in self.list:
-            if item.attr(name):
+            if item.attr(name, value):
                 q.append(item)
             for c in item.children:
-                tq = jQuery(c).attr(name)
+                tq = jQuery(c).attr(name, value)
                 if tq:
                     q.extend(tq.list)
         return jQuery(q)
