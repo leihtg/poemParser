@@ -40,11 +40,11 @@ class Dom:
     def addChild(self, dom):
         self.children.append(dom)
 
-    def hasAttr(self, name, value):
-        _dom=self
+    def attr(self, name):
+        _dom = self
         for a in _dom.attrs:
-            if name == a[0] and value == a[1]:
-                return True
+            if name == a[0]:
+                return a[1]
         return False
 
     def toHtml(self):

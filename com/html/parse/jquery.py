@@ -5,22 +5,32 @@ from com.html.parse.dom import *
 
 
 class jQuery:
-    _dom = 0
 
     def __init__(self, dom):
-        self.list = [dom]
-        self.dom = dom
+        if isinstance(dom, list):
+            self.list = dom
+        else:
+            self.list = [dom]
         pass
 
+
+    def __repr__(self):
+        return str(self.list)
+
     def attr(self, name):
-        _dom = self.dom
-        for a in _dom.attrs:
-            if a[0] == name:
-                return a[1]
+        q = []
+        for item in self.list:
+            if item.attr(name):
+                q.append(item)
+            for c in item.children:
+                tq = jQuery(c).attr(name)
+                if tq:
+                    q.extend(tq.list)
+        return jQuery(q)
 
     def __findAttr(self, an, av, q=[]):
         for item in self.list:
-            if item.hasAttr(an, av):
+            if item.attr(an) == av:
                 q.append(item)
             for c in item.children:
                 jQuery(c).__findAttr(an, av, q)
@@ -35,10 +45,12 @@ class jQuery:
         return q
 
     def toHtml(self):
-        return self.dom.toHtml()
+        if len(self.list):
+            return self.list[0].toHtml()
 
     def text(self):
-        return self.dom.getText()
+        if len(self.list):
+            return self.list[0].getText()
 
     def find(self, selector=""):
         q = []
@@ -51,15 +63,10 @@ class jQuery:
                 self.__findTag(v, q)
             elif t == StorType.CLASS:
                 self.__findAttr('class', v, q)
-        if len(q) > 0:
-            dom = q.pop(0)
-            # dom.children = q
-        else:
-            dom = Dom()
-        return dom
-    # id , tag or class
+        return jQuery(q)
 
 
+# id , tag or class
 rquickExpr = re.compile(r'^#([\w-]+)|(\w+)|\.([\w-]+)$')
 
 
