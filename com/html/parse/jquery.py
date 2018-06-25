@@ -16,6 +16,12 @@ class jQuery:
     def __repr__(self):
         return str(self.list)
 
+    # 实现迭代
+    def __getitem__(self, item):
+        if item < len(self.list):
+            return self.list[item]
+        raise StopIteration
+
     def attr(self, name, value=None):
         q = []
         for item in self.list:
@@ -38,7 +44,7 @@ class jQuery:
     def __findTag(self, tn, q=[]):
         for item in self.list:
             if item.tagName == tn:
-                q.append(self)
+                q.append(item)
             for c in item.children:
                 jQuery(c).__findTag(tn, q)
         return q

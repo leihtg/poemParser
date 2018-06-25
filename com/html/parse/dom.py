@@ -20,7 +20,7 @@ class StorType(Enum):
 class Dom:
     def __init__(self, tagName="", attrs=(), text=""):
         self.children = []
-        self.attrs = attrs
+        self.attrs = list(attrs)
         self.tagName = tagName
         self.text = text
         self.parent = None
@@ -40,28 +40,50 @@ class Dom:
     def addChild(self, dom):
         self.children.append(dom)
 
-    #如果传name和value则表示要修改属性
+    # 去除属性
+    def removeAttr(self, name):
+        for attr in self.attrs:
+            if attr[0] == name:
+                self.attrs.remove(attr)
+        return self
+
+    def addAttr(self, name, value):
+        self.attrs.append((name, value))
+        return self
+
+    # 如果传name和value则表示要修改属性
     def attr(self, name, value=None):
         _dom = self
+        _find = False
+        ret = False
         for a in _dom.attrs:
             if name == a[0]:
                 if value:
-                    pass
+                    _find = True
                 else:
-                    return a[1]
-        return False
+                    ret = a[1]
+                    break
+        if _find:
+            _dom.removeAttr(name).addAttr(name, value)
+        elif value:  # 新增属性
+            _dom.addAttr(name, value)
+
+        return ret
 
     def toHtml(self):
         _dom = self
         if (_dom.tagName == 'text'):
             return _dom.getText()
-        txt = '<%s' % _dom.tagName
-        for attr in _dom.attrs:
-            txt += ' %s="%s"' % (attr[0], attr[1])
-        txt += '>'
+        txt = ''
         for c in _dom.children:
             txt += c.toHtml()
-        txt += '</%s>' % _dom.tagName
+
+        if _dom.tagName:
+            tag = '<%s' % _dom.tagName
+            for attr in _dom.attrs:
+                tag += ' %s="%s"' % (attr[0], attr[1])
+            tag += '>'
+            txt = tag + txt + '</%s>' % _dom.tagName
         return txt
 
     # 获取标签内容
