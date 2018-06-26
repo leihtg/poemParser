@@ -16,7 +16,7 @@ class HtmlDomParser(HTMLParser):
     def __init__(self, url=""):
         print('parse:', url)
         HTMLParser.__init__(self)
-        self.url = url
+        self.url = req.quote(url,'/:&?_')
         self.curDom = self.rootDom = Dom()
         self.domQueue = []
         self.data = ""

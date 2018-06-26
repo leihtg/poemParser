@@ -5,10 +5,13 @@ import os
 
 
 class CopyWeb:
-    maxDeep = 3
+    maxDeep = 1
     linkDir = 'styles'
     scriptDir = 'scripts'
     imgDir = 'images'
+    other = 'res'
+
+    finishUrls = []
 
     def __init__(self, savePath, url, deep=0):
         self.savePath = savePath
@@ -23,7 +26,16 @@ class CopyWeb:
     def doCopy(self):
         if self.deep > self.maxDeep:
             return
+        try:
+            self.finishUrls.index(self.url)
+            print('already save: [%s]' % self.url)
+            return
+        except ValueError as err:
+            pass
+
         parser = self.parser = HtmlDomParser(self.url)
+        # 记录已保存过的url
+        self.finishUrls.append(self.url)
         dom = parser.parse()
         fname = jQuery(dom).find('title').text()
 
@@ -55,15 +67,18 @@ class CopyWeb:
                     suffix = self.scriptDir
                 elif tag == 'img':
                     suffix = self.imgDir
+                else:
+                    suffix = self.other
 
                 realUrl = self.parser.getRealUrl(u)
                 ph = ''
                 if u[0] == '/':
-                    if u[1] and u[1] == '/':  # 对于 `//`开头的用协议头
+                    if len(u) > 1 and u[1] == '/':  # 对于 `//`开头的用协议头
                         f.attr(attr, self.url[:self.url.find(':') + 1] + u)
                         realUrl = None  # 不需要下载
                     else:
-                        ph = './%s%s' % (suffix, u)
+                        if suffix: suffix = '/' + suffix
+                        ph = '.%s%s' % (suffix, u)
                         f.attr(attr, ph)
                 elif u[0] == '#':
                     realUrl = None
@@ -93,7 +108,7 @@ class CopyWeb:
                 CopyWeb(self.savePath + os.path.sep + dir, url, self.deep + 1).doCopy()
 
     def __write(self, fname, data):
-        path = self.savePath + os.path.sep + fname
+        path = os.path.realpath(self.savePath + os.path.sep + fname)
         dirname = os.path.dirname(path)
         if os.path.exists(dirname):
             if not os.path.isdir(dirname):
@@ -108,9 +123,13 @@ class CopyWeb:
             f.write(data)
 
 
-url = 'http://www.vimregex.com/'
-cw = CopyWeb(r'C:\Users\leihuating\Desktop\copy', url)
-cw.doCopy()
+# url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
+# cw = CopyWeb(r'D:\copyWeb\java_gc', url)
+# cw.doCopy()
+
+url = 'https://segmentfault.com/questions/hottest?utm_source=sf-footer&utm_medium=footer-nav&utm_campaign=product&utm_content=footer-links-hottest-questions&utm_term=热门问答'
+p = HtmlDomParser(url)
+p.parse()
 
 from redis import *
 
