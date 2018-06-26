@@ -44,11 +44,23 @@ class HtmlDomParser(HTMLParser):
         self.data = data
 
     def parse(self):
-        if self.data == "":
-            self.data = req.urlopen(self.url).read().decode("utf-8")
-        self.feed(self.data)
-        if len(self.domQueue):
-            self.rootDom.addChild(self.domQueue.pop())
+        try:
+            if self.data == "":
+                resp = req.urlopen(self.url)
+                encode = 'iso-8859-1'
+                for h in resp.headers._headers:
+                    if h[0] == 'Content-Type':
+                        for val in h[1].split(';'):
+                            if val.find('charset=') > 0:
+                                encode = val.split('charset=')[1]
+                                break
+                    pass
+                self.data = resp.read().decode(encode)
+            self.feed(self.data)
+            if len(self.domQueue):
+                self.rootDom.addChild(self.domQueue.pop())
+        except req.HTTPError as args:
+            print('error:[%s],url:[%s]' % (args, self.url))
         return self.rootDom
 
     # Overridable -- finish processing of start+end tag: <tag.../>
@@ -65,8 +77,8 @@ class HtmlDomParser(HTMLParser):
         self.st = True
         dom = Dom(tag, attrs)
         self.curDom.addChild(dom)
-        if tag=="html":
-            self.rootDom=dom
+        if tag == "html":
+            self.rootDom = dom
         else:
             dom.parent = self.curDom
 
