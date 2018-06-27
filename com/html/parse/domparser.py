@@ -40,6 +40,13 @@ class HtmlAttr:
             self.data = data.decode(self.charset)
         else:
             html = data.decode(self.defCharset)
+            g = r.search(html)
+            if g:
+                self.charset = g.group(1).replace('\'\"', '')
+                self.data = data.decode(self.charset)
+            else:
+                self.charset = self.defCharset
+                self.data = html
 
     def isHtml(self):
         return 'text/html' == self.contentType.lower()

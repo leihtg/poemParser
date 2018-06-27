@@ -132,11 +132,15 @@ class CopyWeb:
             f.write(data)
 
 
-url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
-url='http://127.0.0.1/favicon.ico'
-cw = CopyWeb(r'D:\copyWeb\java_gc', url)
-cw.doCopy()
-
+# url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
+# url='http://127.0.0.1/favicon.ico'
+# cw = CopyWeb(r'D:\copyWeb\java_gc', url)
+# cw.doCopy()
+import re
+r = re.compile(r'<meta\s+charset=(.*?)>', re.I)
+g=r.search('  <meta    charset="utf8" >  <meta charset="gbk"  >',1)
+if g:
+    print(g)
 from redis import *
 
 # r = Redis(host="172.29.97.155")
