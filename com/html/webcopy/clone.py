@@ -1,10 +1,19 @@
 from com.html.parse import *
 import urllib.request as req
-
 import os
+
+class WebAttr:
+    '''
+
+    '''
+    def __init__(self,url):
+        self.url=url
 
 
 class CopyWeb:
+    '''
+    复制网页
+    '''
     maxDeep = 1
     linkDir = 'styles'
     scriptDir = 'scripts'
@@ -72,15 +81,15 @@ class CopyWeb:
 
                 realUrl = self.parser.getRealUrl(u)
                 ph = ''
-                if u[0] == '/':
-                    if len(u) > 1 and u[1] == '/':  # 对于 `//`开头的用协议头
+                if u.startswith('/'):
+                    if u.startswith('//'):  # 对于 `//`开头的用协议头
                         f.attr(attr, self.url[:self.url.find(':') + 1] + u)
                         realUrl = None  # 不需要下载
                     else:
                         if suffix: suffix = '/' + suffix
                         ph = '.%s%s' % (suffix, u)
                         f.attr(attr, ph)
-                elif u[0] == '#':
+                elif u.startswith('#'):
                     realUrl = None
                     pass
                 else:
@@ -123,13 +132,10 @@ class CopyWeb:
             f.write(data)
 
 
-# url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
-# cw = CopyWeb(r'D:\copyWeb\java_gc', url)
-# cw.doCopy()
-
-url = 'https://segmentfault.com/questions/hottest?utm_source=sf-footer&utm_medium=footer-nav&utm_campaign=product&utm_content=footer-links-hottest-questions&utm_term=热门问答'
-p = HtmlDomParser(url)
-p.parse()
+url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
+url='http://127.0.0.1/favicon.ico'
+cw = CopyWeb(r'D:\copyWeb\java_gc', url)
+cw.doCopy()
 
 from redis import *
 
