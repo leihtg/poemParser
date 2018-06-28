@@ -1,13 +1,16 @@
 from com.html.parse import *
+from com.html.utils import *
 import urllib.request as req
 import os
+
 
 class WebAttr:
     '''
 
     '''
-    def __init__(self,url):
-        self.url=url
+
+    def __init__(self, url):
+        self.url = url
 
 
 class CopyWeb:
@@ -22,10 +25,11 @@ class CopyWeb:
 
     finishUrls = []
 
-    def __init__(self, savePath, url, deep=0):
+    def __init__(self, savePath, url, alterName=False, deep=0):
         self.savePath = savePath
-        self.url = url
+        self.url = Utils.urlClean(url)
         self.deep = deep  # 复制深度
+        self.alterName = alterName
         pass
 
     # 需要转换的字段
@@ -46,13 +50,21 @@ class CopyWeb:
         # 记录已保存过的url
         self.finishUrls.append(self.url)
         dom = parser.parse()
-        fname = jQuery(dom).find('title').text()
+
+        # 如果不是网页则保存文件
+        if not parser.meta.isHtml():
+            self.__saveSource([('source', self.url, os.path.basename(self.url))])
+            return
 
         # 保存主网页
-        if not fname:
-            fname = self.url[self.url.rfind('/') + 1:]
-        if fname.rfind('.') == -1:
-            fname += '.html'
+        fname = self.url[self.url.rfind('/') + 1:]
+        if fname.find('?') > -1:
+            fname = fname[:fname.find('?')]
+        if self.alterName:
+            _fname = jQuery(dom).find('title').text()
+            if _fname:
+                fname = _fname
+            fname = fname.replace('/', '-') + '.html'
         self.__doTransfer(dom)
         self.__write(fname, dom.toHtml())
 
@@ -106,7 +118,7 @@ class CopyWeb:
     def __saveSource(self, urls):
         for u in urls:
             tag, url, path = u[0], u[1], u[2]
-            if tag == 'img' or tag == 'link' or tag == 'script':
+            if tag == 'img' or tag == 'link' or tag == 'script' or tag == 'source':
                 try:
                     data = req.urlopen(url).read()
                     self.__write(path, data)
@@ -114,7 +126,7 @@ class CopyWeb:
                     print('error:[%s],url:[%s]' % (args, url))
             else:
                 dir = os.path.dirname(path)
-                CopyWeb(self.savePath + os.path.sep + dir, url, self.deep + 1).doCopy()
+                CopyWeb(self.savePath + os.path.sep + dir, url, False, self.deep + 1).doCopy()
 
     def __write(self, fname, data):
         path = os.path.realpath(self.savePath + os.path.sep + fname)
@@ -132,16 +144,13 @@ class CopyWeb:
             f.write(data)
 
 
-# url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
-# url='http://127.0.0.1/favicon.ico'
-# cw = CopyWeb(r'D:\copyWeb\java_gc', url)
+url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
+url = 'https://tools.ietf.org/html/rfc2616#section-14.17'
+cw = CopyWeb(r'D:\copyWeb\http', url, True)
 # cw.doCopy()
-import re
-r = re.compile(r'<meta\s+charset=(.*?)>', re.I)
-g=r.search('  <meta    charset="utf8" >  <meta charset="gbk"  >',1)
-if g:
-    print(g)
+
 from redis import *
+
 
 # r = Redis(host="172.29.97.155")
 # conn=r.pubsub()
@@ -150,3 +159,4 @@ from redis import *
 # while True:
 #     sb=conn.parse_response()
 #     print(sb)
+
