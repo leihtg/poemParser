@@ -66,7 +66,6 @@ class HtmlDomParser(HTMLParser):
         self.curDom = self.rootDom = Dom()
         self.domQueue = []
         self.data = ""
-        self.st = False
 
     def setUrl(self, url):
         self.url = url
@@ -88,11 +87,6 @@ class HtmlDomParser(HTMLParser):
 
     def setData(self, data=""):
         self.data = data
-
-    def __reset(self):
-        self.curDom = self.rootDom = Dom()
-        self.domQueue = []
-        self.st = False
 
     def parse(self):
         try:
@@ -122,7 +116,6 @@ class HtmlDomParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if debug:
             print("start: %s" % tag)
-        self.st = True
         dom = Dom(tag, attrs)
         self.curDom.addChild(dom)
         if tag == "html":
@@ -144,7 +137,6 @@ class HtmlDomParser(HTMLParser):
     def handle_endtag(self, tag):
         if debug:
             print("end: %s" % tag)
-        self.st = False
         # 一些网页不规范,不该有关闭标签的忽略
         if oneTag(tag) and self.curDom.tagName != tag:
             self.curDom.addChild(Dom(tag))
@@ -178,8 +170,7 @@ class HtmlDomParser(HTMLParser):
 
     # Overridable -- handle data
     def handle_data(self, data):
-        if self.st:
-            self.curDom.addChild(Dom("text", text=data))
+        self.curDom.addChild(Dom("text", text=data))
         pass
 
     # Overridable -- handle comment
@@ -208,10 +199,10 @@ def oneTag(tag):
 
 
 if __name__ == "__main__":
-    debug = False
-    path = r"C:\Users\leihuating\Desktop\a"
+    debug = True
     path = r"C:\Users\Thinkpad\Desktop\a.txt"
-    ps = HtmlDomParser()
+    path = r"C:\Users\leihuating\Desktop\a"
+    ps = HtmlDomParser('https://tools.ietf.org/html/rfc2616#section-14.17')
     ps.setData(open(path, encoding="utf-8").read())
     dom = ps.parse()
-    print(dom.find('html').toHtml())
+    print(dom.toHtml())

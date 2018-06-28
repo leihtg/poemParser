@@ -47,9 +47,9 @@ class CopyWeb:
             pass
 
         parser = self.parser = HtmlDomParser(self.url)
+        dom = parser.parse()
         # 记录已保存过的url
         self.finishUrls.append(self.url)
-        dom = parser.parse()
 
         # 如果不是网页则保存文件
         if not parser.meta.isHtml():
@@ -147,7 +147,7 @@ class CopyWeb:
 url = 'https://segmentfault.com/a/1190000004926898?_ea=1734786#articleHeader19'
 url = 'https://tools.ietf.org/html/rfc2616#section-14.17'
 cw = CopyWeb(r'D:\copyWeb\http', url, True)
-# cw.doCopy()
+cw.doCopy()
 
 from redis import *
 
